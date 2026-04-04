@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYM MONITOR - V39 CARDIO AXIS FIX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GYM MONITOR - V41 MOBILE OPTIMIZED</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -47,22 +47,49 @@
         table { width: 100%; border-collapse: collapse; text-align: center; }
         th { padding: 12px; color: var(--text-dim); border-bottom: 1px solid var(--border); font-size: 0.85rem; }
         td { padding: 18px 12px; border-bottom: 1px solid #1a1d21; }
-		/* 手機版 RWD 響應式設定 */
+
+        /* === 手機版 RWD 深度優化設定 (V41) === */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .main-layout { flex-direction: column; gap: 20px; }
-            .sidebar { flex: none; width: 100%; position: static; }
-            .content { width: 100%; }
-            .input-row { flex-direction: column; align-items: stretch; gap: 15px; }
-            .input-group { width: 100%; }
-            .input-group select, .input-group input { width: 100% !important; } /* 讓輸入框在手機上填滿寬度 */
-            .btn-sync { height: 50px; font-size: 1.1rem; }
-            .chart-wrapper { height: 400px; } /* 手機上圖表稍微縮短一點 */
-            .history-ctrl { flex-direction: column; gap: 15px; align-items: stretch; }
-            .history-ctrl .toggle-group { width: 100%; display: flex; }
-            .history-ctrl .btn-toggle { flex: 1; }
-            table { font-size: 0.8rem; }
-            td { padding: 10px 5px; }
+            .main-layout { flex-direction: column; gap: 18px; }
+            .sidebar { flex: none; width: 100%; position: static; gap: 18px; }
+            .content { width: 100%; gap: 18px; }
+            
+            /* 面板內部間距稍微縮減，爭取更多螢幕空間 */
+            .panel { padding: 20px 15px; border-radius: 16px; }
+            
+            /* 輸入表單區垂直排列，加大間距與點擊高度 */
+            .input-row { flex-direction: column; align-items: stretch; gap: 18px; }
+            .input-group { width: 100%; gap: 8px; }
+            .input-group label { text-align: left; padding-left: 5px; font-size: 1rem; }
+            
+            /* 解決 iPhone 自動縮放問題 (font-size:16px)，並加大高度 */
+            input, select { 
+                width: 100% !important; 
+                height: 52px; 
+                font-size: 16px !important; 
+                border-radius: 12px; 
+            }
+            
+            /* 重量/組數 這些比較短的維持並排，但中間空隙加大 */
+            #strengthFields, #cardioFields { flex-wrap: wrap; gap: 15px; width: 100%; }
+            #strengthFields .input-group, #cardioFields .input-group { flex: 1; min-width: 45%; }
+            
+            /* 按鈕極致放大，好按防呆 */
+            .btn-sync { height: 56px; font-size: 1.15rem; margin-top: 5px; border-radius: 14px; }
+            
+            /* 控制區不再硬擠，改成上下排列，按鈕佔滿寬度 */
+            .chart-ctrl, .history-ctrl { flex-direction: column; align-items: stretch; gap: 15px; }
+            .chart-ctrl > div, .history-ctrl > div { flex-direction: column; width: 100%; gap: 15px; align-items: stretch !important; }
+            .toggle-group { display: flex; width: 100%; gap: 10px; }
+            .toggle-group .btn-toggle { flex: 1; padding: 12px; font-size: 1.05rem; }
+            
+            /* 圖表高度縮減適應手機畫面 */
+            .chart-wrapper { height: 320px; margin-top: 10px; }
+            
+            /* 表格加上絲滑滾動，字體稍微調大保護眼睛 */
+            table { font-size: 0.95rem; display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+            th, td { padding: 16px 12px; }
         }
     </style>
 </head>
@@ -73,20 +100,20 @@
         <div class="panel">
             <button id="checkInBtn" class="btn-sync" onclick="doCheckIn()">⚡ 今日訓練打卡</button>
             <div class="cal-header">
-                <button onclick="changeMonth(-1)" style="background:none; border:none; color:var(--accent); cursor:pointer;">◀</button>
+                <button onclick="changeMonth(-1)" style="background:none; border:none; color:var(--accent); cursor:pointer; padding:10px 15px;">◀</button>
                 <span id="calMonthDisplay">2026 / 04</span>
-                <button onclick="changeMonth(1)" style="background:none; border:none; color:var(--accent); cursor:pointer;">▶</button>
+                <button onclick="changeMonth(1)" style="background:none; border:none; color:var(--accent); cursor:pointer; padding:10px 15px;">▶</button>
             </div>
             <div class="cal-grid" id="calBox"></div>
         </div>
         
-        <div class="panel" style="flex: 1;">
+        <div class="panel">
             <div class="section-header">任務清單</div>
-            <div style="display: flex; flex-direction: column; gap: 28px; padding-top: 10px;">
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer;"><input type="checkbox" style="width:20px; height:20px; accent-color:var(--accent);"> <span>動態拉伸熱身</span></label>
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer;"><input type="checkbox" style="width:20px; height:20px; accent-color:var(--accent);"> <span>目標肌群預熱</span></label>
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer;"><input type="checkbox" style="width:20px; height:20px; accent-color:var(--accent);"> <span>核心穩定訓練</span></label>
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer;"><input type="checkbox" style="width:20px; height:20px; accent-color:var(--accent);"> <span>冷身與拉伸</span></label>
+            <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 5px;">
+                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">動態拉伸熱身</span></label>
+                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">目標肌群預熱</span></label>
+                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">核心穩定訓練</span></label>
+                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">冷身與拉伸</span></label>
             </div>
         </div>
     </div>
@@ -101,40 +128,40 @@
                 </div>
                 <div class="input-group">
                     <label>訓練肌群</label>
-                    <select id="inputGroup" onchange="updateItems()" style="width: 120px;"></select>
+                    <select id="inputGroup" onchange="updateItems()"></select>
                 </div>
                 <div class="input-group">
                     <label>訓練項目</label>
-                    <select id="inputItem" style="width: 160px;"></select>
+                    <select id="inputItem"></select>
                 </div>
 
                 <div id="strengthFields" style="display: flex; gap: 15px;">
-                    <div class="input-group"><label>重量 (kg)</label><input type="number" id="inputW" style="width: 80px;" placeholder="0"></div>
-                    <div class="input-group"><label>組數</label><input type="number" id="inputS" style="width: 80px;" placeholder="0"></div>
+                    <div class="input-group"><label>重量 (kg)</label><input type="number" id="inputW" placeholder="0"></div>
+                    <div class="input-group"><label>組數</label><input type="number" id="inputS" placeholder="0"></div>
                 </div>
 
                 <div id="cardioFields" style="display: none; gap: 10px;">
-                    <div class="input-group"><label>坡度 (%)</label><input type="number" id="inputSlope" style="width: 70px;" placeholder="0"></div>
-                    <div class="input-group"><label>速度</label><input type="number" id="inputSpeed" style="width: 70px;" placeholder="0"></div>
-                    <div class="input-group"><label>時長 (min)</label><input type="number" id="inputTime" style="width: 80px;" placeholder="0"></div>
-                    <div class="input-group"><label>心率</label><input type="number" id="inputHR" style="width: 70px;" placeholder="0"></div>
+                    <div class="input-group"><label>坡度 (%)</label><input type="number" id="inputSlope" placeholder="0"></div>
+                    <div class="input-group"><label>速度</label><input type="number" id="inputSpeed" placeholder="0"></div>
+                    <div class="input-group"><label>時長 (min)</label><input type="number" id="inputTime" placeholder="0"></div>
+                    <div class="input-group"><label>心率</label><input type="number" id="inputHR" placeholder="0"></div>
                 </div>
 
                 <div class="input-group">
-                    <button class="btn-sync" style="width:auto; padding:0 30px; height:48px;" onclick="saveRecord()">儲存</button>
+                    <button class="btn-sync" onclick="saveRecord()">確認新增紀錄</button>
                 </div>
             </div>
         </div>
 
         <div class="panel">
             <div class="chart-ctrl">
-                <div class="section-header" style="margin:0;">訓練數據監控 (近 5 日)</div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <input type="date" id="chartRangeStart" style="padding:5px; font-size:0.8rem;" onchange="updateCharts()">
-                    <div class="toggle-group" style="display:flex; gap:5px;">
-                        <button id="chartModeStr" class="btn-toggle active" onclick="switchChartMode('str')">重量訓練</button>
-                        <button id="chartModeCrdo" class="btn-toggle" onclick="switchChartMode('crdo')">有氧運動</button>
+                <div class="section-header" style="margin:0;">訓練數據監控</div>
+                <div style="display:flex; flex-direction:column; width:100%; gap:15px;">
+                    <div class="toggle-group" style="display:flex; width:100%;">
+                        <button id="chartModeStr" class="btn-toggle active" style="flex:1;" onclick="switchChartMode('str')">重量訓練</button>
+                        <button id="chartModeCrdo" class="btn-toggle" style="flex:1;" onclick="switchChartMode('crdo')">有氧運動</button>
                     </div>
+                    <input type="date" id="chartRangeStart" onchange="updateCharts()">
                 </div>
             </div>
             <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
@@ -143,13 +170,15 @@
         <div class="panel">
             <div class="history-ctrl">
                 <div class="section-header" style="margin:0;">歷史活動日誌</div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <div class="toggle-group" style="display:flex; gap:5px; margin-right:15px;">
-                        <button id="histModeStr" class="btn-toggle active" onclick="switchHistMode('str')">重量訓練</button>
-                        <button id="histModeCrdo" class="btn-toggle" onclick="switchHistMode('crdo')">有氧運動</button>
+                <div style="display:flex; flex-direction:column; width:100%; gap:15px;">
+                    <div class="toggle-group" style="display:flex; width:100%;">
+                        <button id="histModeStr" class="btn-toggle active" style="flex:1;" onclick="switchHistMode('str')">重訓日誌</button>
+                        <button id="histModeCrdo" class="btn-toggle" style="flex:1;" onclick="switchHistMode('crdo')">有氧日誌</button>
                     </div>
-                    <input type="date" id="historyFilter" onchange="renderHistory()">
-                    <button class="btn-toggle" style="padding:4px 12px;" onclick="resetHistory()">重設</button>
+                    <div style="display:flex; width:100%; gap:10px;">
+                        <input type="date" id="historyFilter" style="flex:2;" onchange="renderHistory()">
+                        <button class="btn-toggle" style="flex:1;" onclick="resetHistory()">查看今日</button>
+                    </div>
                 </div>
             </div>
             <table id="historyTable">
@@ -161,8 +190,8 @@
 </div>
 
 <script>
-    let logs = JSON.parse(localStorage.getItem('gym_v39_logs')) || [];
-    let checks = JSON.parse(localStorage.getItem('gym_v39_checks')) || {};
+    let logs = JSON.parse(localStorage.getItem('gym_v41_logs')) || [];
+    let checks = JSON.parse(localStorage.getItem('gym_v41_checks')) || {};
     let currentCalDate = new Date();
     let chartObj;
     let histMode = 'str'; 
@@ -171,8 +200,8 @@
     const exerciseDB = {
         "胸部": ["啞鈴上斜胸推", "Cable 飛鳥夾胸", "槓鈴臥推", "固定式機械胸推", "固定式機械飛鳥"],
         "背部": ["引體向上", "滑輪下拉", "槓鈴划船", "坐姿划船", "單臂啞鈴划船"],
-        "腿部": ["槓鈴深蹲", "腿舉機 (Leg Press)", "保加利亞分腿蹲", "腿彎舉", "大腿內收訓練機"],
-        "臀部": ["槓鈴臀推", "壺鈴搖擺", "羅馬尼亞硬舉 (RDL)"],
+        "腿部": ["槓鈴深蹲", "腿舉機", "保加利亞分腿蹲", "腿彎舉"],
+        "臀部": ["槓鈴臀推", "壺鈴搖擺", "羅馬尼亞硬舉"],
         "肩膀": ["啞鈴肩推", "滑輪側平舉", "槓鈴站姿肩推", "反向飛鳥"],
         "二頭": ["啞鈴二頭彎舉", "槓鈴彎舉", "錘式彎舉"],
         "腹肌": ["懸垂舉腿", "機械式捲腹", "仰臥起坐", "俄羅斯轉體"],
@@ -234,7 +263,7 @@
         }
 
         logs.push(entry);
-        localStorage.setItem('gym_v39_logs', JSON.stringify(logs));
+        localStorage.setItem('gym_v41_logs', JSON.stringify(logs));
         
         ["inputW", "inputS", "inputSlope", "inputSpeed", "inputTime", "inputHR"].forEach(id => document.getElementById(id).value = '');
         
@@ -266,9 +295,9 @@
         const body = document.getElementById('historyBody');
         
         if (histMode === 'str') {
-            head.innerHTML = `<tr><th>日期</th><th>肌群</th><th>項目</th><th>重量 (kg)</th><th>組數</th><th>操作</th></tr>`;
+            head.innerHTML = `<tr><th>肌群</th><th>項目</th><th>kg</th><th>組</th><th>操作</th></tr>`;
         } else {
-            head.innerHTML = `<tr><th>日期</th><th>項目</th><th>坡度 (%)</th><th>速度</th><th>時長 (min)</th><th>心率 (bpm)</th><th>操作</th></tr>`;
+            head.innerHTML = `<tr><th>項目</th><th>坡度</th><th>速</th><th>min</th><th>心率</th><th>操作</th></tr>`;
         }
 
         const filtered = logs.filter(l => l.date === filter && l.isCrdo === (histMode === 'crdo')).reverse();
@@ -276,22 +305,20 @@
         body.innerHTML = filtered.map(l => {
             if (histMode === 'str') {
                 return `<tr>
-                    <td>${l.date.slice(5)}</td>
                     <td style="color:var(--accent); font-weight:bold;">${l.group}</td>
                     <td style="font-weight:700;">${l.item}</td>
                     <td>${l.weight}</td>
                     <td>${l.sets}</td>
-                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer;">刪除</button></td>
+                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.2rem; padding:5px 15px; font-weight:bold;">✕</button></td>
                 </tr>`;
             } else {
                 return `<tr>
-                    <td>${l.date.slice(5)}</td>
                     <td style="font-weight:700; color:var(--cardio-color);">${l.item}</td>
                     <td>${l.slope}</td>
                     <td>${l.speed}</td>
                     <td>${l.time}</td>
                     <td>${l.hr}</td>
-                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer;">刪除</button></td>
+                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.2rem; padding:5px 15px; font-weight:bold;">✕</button></td>
                 </tr>`;
             }
         }).join('');
@@ -308,11 +335,11 @@
                     y: { 
                         min: 80, max: 800, 
                         ticks: { color: '#666', stepSize: 80 }, 
-                        grid: { color: '#222' },
-                        title: { display: true, text: '總容量 (重量 × 組數)', color: '#0d9488' }
+                        grid: { color: '#222' }
                     },
                     x: { ticks: { color: '#888' }, grid: { display: false } }
-                }
+                },
+                plugins: { legend: { display: false } }
             }
         });
         updateCharts();
@@ -331,12 +358,10 @@
         const alphas = [0.10, 0.25, 0.50, 0.75, 1.0];
 
         if (chartMode === 'str') {
-            const strGroups = ["胸部", "背部", "腿部", "臀部", "肩膀", "二頭", "腹肌"];
+            const strGroups = ["胸部", "背部", "腿部", "肩膀", "臀部"];
             chartObj.options.scales.y.min = 80;
             chartObj.options.scales.y.max = 800;
             chartObj.options.scales.y.ticks.stepSize = 80;
-            chartObj.options.scales.y.title.text = '總容量 (重量 × 組數)';
-            chartObj.options.scales.y.title.color = '#0d9488';
             chartObj.data.labels = strGroups;
             chartObj.data.datasets = dates.map((d, i) => ({
                 label: d.slice(5),
@@ -345,16 +370,13 @@
                     const gLogs = logs.filter(l => l.date === d && l.group === g && !l.isCrdo);
                     return gLogs.reduce((sum, curr) => sum + (curr.weight * curr.sets), 0);
                 }),
-                barThickness: 15
+                barThickness: window.innerWidth < 768 ? 10 : 15
             })).filter(ds => ds.data.some(v => v > 0));
         } else {
-            const crdoItems = exerciseDB["有氧"];
-            // === 核心修改區：設定有氧圖表的最大值為120，間距為20 ===
+            const crdoItems = ["跑步機", "橢圓機", "登階機", "飛輪"];
             chartObj.options.scales.y.min = 0;
             chartObj.options.scales.y.max = 120;
             chartObj.options.scales.y.ticks.stepSize = 20; 
-            chartObj.options.scales.y.title.text = '運動時長 (分鐘)';
-            chartObj.options.scales.y.title.color = '#ef4444';
             chartObj.data.labels = crdoItems;
             chartObj.data.datasets = dates.map((d, i) => ({
                 label: d.slice(5),
@@ -363,7 +385,7 @@
                     const cLogs = logs.filter(l => l.date === d && l.isCrdo && l.item === item);
                     return cLogs.reduce((sum, curr) => sum + Number(curr.time), 0);
                 }),
-                barThickness: 15
+                barThickness: window.innerWidth < 768 ? 10 : 15
             })).filter(ds => ds.data.some(v => v > 0));
         }
         
@@ -373,7 +395,7 @@
     function doCheckIn() {
         const today = getGymDate();
         checks[today] = true;
-        localStorage.setItem('gym_v39_checks', JSON.stringify(checks));
+        localStorage.setItem('gym_v41_checks', JSON.stringify(checks));
         alert("打卡成功！");
         renderCalendar();
         updateCheckBtn();
@@ -403,7 +425,7 @@
     function resetHistory() { document.getElementById('historyFilter').value = getGymDate(); renderHistory(); }
     function deleteLog(id) {
         logs = logs.filter(l => l.id !== id);
-        localStorage.setItem('gym_v39_logs', JSON.stringify(logs));
+        localStorage.setItem('gym_v41_logs', JSON.stringify(logs));
         renderHistory(); updateCharts();
     }
 </script>
