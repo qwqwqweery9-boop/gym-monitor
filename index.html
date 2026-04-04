@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GYM MONITOR - V41 MOBILE OPTIMIZED</title>
+    <title>GYM MONITOR - V42 MOBILE PERFECT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -18,15 +18,19 @@
         
         .sidebar { flex: 0 0 320px; display: flex; flex-direction: column; gap: 25px; position: sticky; top: 20px; }
         .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .btn-sync { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-sync { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; display: block; }
         .btn-sync:disabled { background: #222; color: #555; cursor: not-allowed; }
 
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-weight: bold; color: var(--accent); }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 15px; text-align: center; }
         .cal-item { aspect-ratio: 1; border-radius: 8px; background: #1a1d21; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--text-dim); border: 1px solid transparent; }
         .cal-item.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-        .v-mark { color: var(--accent); font-weight: 900; font-size: 0.9rem; }
-        .x-mark { color: var(--cardio-color); font-weight: 900; font-size: 0.9rem; opacity: 0.6; }
+        
+        /* 任務清單 - 電腦版樣式 */
+        .task-list { display: flex; flex-direction: column; gap: 28px; padding-top: 10px; }
+        .task-item { display:flex; align-items:center; gap:15px; cursor:pointer; }
+        .task-item input { width:20px; height:20px; accent-color:var(--accent); cursor:pointer; }
+        .task-item span { font-size: 1rem; color: var(--text-main); }
 
         .content { flex: 1; display: flex; flex-direction: column; gap: 25px; min-width: 0; }
         .section-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--accent); }
@@ -41,55 +45,71 @@
         .chart-wrapper { height: 600px; width: 100%; }
 
         .history-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-toggle { background: #1a1d21; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-toggle { background: #1a1d21; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; }
         .btn-toggle.active { background: var(--accent); color: #fff; border-color: var(--accent); }
         
         table { width: 100%; border-collapse: collapse; text-align: center; }
         th { padding: 12px; color: var(--text-dim); border-bottom: 1px solid var(--border); font-size: 0.85rem; }
         td { padding: 18px 12px; border-bottom: 1px solid #1a1d21; }
 
-        /* === 手機版 RWD 深度優化設定 (V41) === */
+        /* === 終極手機版優化設定 (V42) - 徹底解決版面跑掉問題 === */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .main-layout { flex-direction: column; gap: 18px; }
-            .sidebar { flex: none; width: 100%; position: static; gap: 18px; }
-            .content { width: 100%; gap: 18px; }
+            .main-layout { flex-direction: column; gap: 20px; align-items: center; }
             
-            /* 面板內部間距稍微縮減，爭取更多螢幕空間 */
-            .panel { padding: 20px 15px; border-radius: 16px; }
+            /* 側邊欄與內容區全部佔滿寬度 */
+            .sidebar { flex: none; width: 100%; position: static; gap: 20px; align-items: center; }
+            .content { width: 100%; gap: 20px; align-items: center; }
+            
+            /* 面板寬度佔滿，加大上下間距 */
+            .panel { padding: 25px 15px; border-radius: 16px; width: 100%; }
+            
+            /* 重頭戲：任務清單徹底重寫 - 改為垂直垂直垂直排！ */
+            .task-list { gap: 30px; align-items: center; text-align: center; }
+            .task-item { flex-direction: column; gap: 15px; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; width: 80%; }
+            .task-item:last-child { border-bottom: none; padding-bottom: 0; }
+            .task-item input { width: 40px; height: 40px; } /* 超大勾選框，防手震 */
+            .task-item span { font-size: 1.15rem; font-weight: bold; }
             
             /* 輸入表單區垂直排列，加大間距與點擊高度 */
-            .input-row { flex-direction: column; align-items: stretch; gap: 18px; }
-            .input-group { width: 100%; gap: 8px; }
-            .input-group label { text-align: left; padding-left: 5px; font-size: 1rem; }
+            .input-row { flex-direction: column; align-items: stretch; gap: 20px; }
+            .input-group { width: 100%; gap: 10px; }
+            .input-group label { text-align: center; font-size: 1.05rem; }
             
             /* 解決 iPhone 自動縮放問題 (font-size:16px)，並加大高度 */
             input, select { 
                 width: 100% !important; 
-                height: 52px; 
+                height: 56px; 
                 font-size: 16px !important; 
                 border-radius: 12px; 
+                text-align-last: center; /* 讓 select 文字也置中 */
             }
             
-            /* 重量/組數 這些比較短的維持並排，但中間空隙加大 */
-            #strengthFields, #cardioFields { flex-wrap: wrap; gap: 15px; width: 100%; }
+            /* 重量/組數 比較短的在手機上維持並排，但中間空隙加大 */
+            #strengthFields, #cardioFields { flex-wrap: wrap; gap: 15px; width: 100%; justify-content: space-between; }
             #strengthFields .input-group, #cardioFields .input-group { flex: 1; min-width: 45%; }
             
             /* 按鈕極致放大，好按防呆 */
-            .btn-sync { height: 56px; font-size: 1.15rem; margin-top: 5px; border-radius: 14px; }
+            .btn-sync { height: 60px; font-size: 1.25rem; margin-top: 10px; border-radius: 14px; }
             
-            /* 控制區不再硬擠，改成上下排列，按鈕佔滿寬度 */
-            .chart-ctrl, .history-ctrl { flex-direction: column; align-items: stretch; gap: 15px; }
-            .chart-ctrl > div, .history-ctrl > div { flex-direction: column; width: 100%; gap: 15px; align-items: stretch !important; }
-            .toggle-group { display: flex; width: 100%; gap: 10px; }
-            .toggle-group .btn-toggle { flex: 1; padding: 12px; font-size: 1.05rem; }
+            /* 控制區垂直排列，按鈕佔滿寬度 */
+            .chart-ctrl, .history-ctrl { flex-direction: column; align-items: stretch; gap: 18px; text-align: center; }
+            .chart-ctrl > div, .history-ctrl > div { flex-direction: column; width: 100%; gap: 18px; align-items: stretch !important; }
+            .toggle-group { display: flex; width: 100%; gap: 12px; }
+            .toggle-group .btn-toggle { flex: 1; padding: 15px; font-size: 1.1rem; text-align: center; }
             
             /* 圖表高度縮減適應手機畫面 */
-            .chart-wrapper { height: 320px; margin-top: 10px; }
+            .chart-wrapper { height: 350px; margin-top: 15px; }
             
-            /* 表格加上絲滑滾動，字體稍微調大保護眼睛 */
-            table { font-size: 0.95rem; display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; border-radius: 8px; }
-            th, td { padding: 16px 12px; }
+            /* 表格加上絲滑滾動，字體調大保護眼睛 */
+            table { font-size: 1rem; display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+            th, td { padding: 18px 15px; }
+            
+            /* 打卡按鈕置中並加大 */
+            #checkInBtn { width: 90%; margin: 0 auto; height: 60px; font-size: 1.25rem; }
+            
+            /* 日曆月份切換按鈕加大 */
+            .cal-header button { padding: 15px 20px; font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -100,20 +120,20 @@
         <div class="panel">
             <button id="checkInBtn" class="btn-sync" onclick="doCheckIn()">⚡ 今日訓練打卡</button>
             <div class="cal-header">
-                <button onclick="changeMonth(-1)" style="background:none; border:none; color:var(--accent); cursor:pointer; padding:10px 15px;">◀</button>
+                <button onclick="changeMonth(-1)" style="background:none; border:none; color:var(--accent); cursor:pointer;">◀</button>
                 <span id="calMonthDisplay">2026 / 04</span>
-                <button onclick="changeMonth(1)" style="background:none; border:none; color:var(--accent); cursor:pointer; padding:10px 15px;">▶</button>
+                <button onclick="changeMonth(1)" style="background:none; border:none; color:var(--accent); cursor:pointer;">▶</button>
             </div>
             <div class="cal-grid" id="calBox"></div>
         </div>
         
         <div class="panel">
             <div class="section-header">任務清單</div>
-            <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 5px;">
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">動態拉伸熱身</span></label>
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">目標肌群預熱</span></label>
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">核心穩定訓練</span></label>
-                <label style="display:flex; align-items:center; gap:15px; cursor:pointer; padding: 5px 0;"><input type="checkbox" style="width:24px; height:24px; accent-color:var(--accent);"> <span style="font-size:1.1rem;">冷身與拉伸</span></label>
+            <div class="task-list">
+                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">動態拉伸熱身</span></label>
+                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">目標肌群預熱</span></label>
+                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">核心穩定訓練</span></label>
+                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">冷身與拉伸</span></label>
             </div>
         </div>
     </div>
@@ -190,8 +210,8 @@
 </div>
 
 <script>
-    let logs = JSON.parse(localStorage.getItem('gym_v41_logs')) || [];
-    let checks = JSON.parse(localStorage.getItem('gym_v41_checks')) || {};
+    let logs = JSON.parse(localStorage.getItem('gym_v42_logs')) || [];
+    let checks = JSON.parse(localStorage.getItem('gym_v42_checks')) || {};
     let currentCalDate = new Date();
     let chartObj;
     let histMode = 'str'; 
@@ -263,7 +283,7 @@
         }
 
         logs.push(entry);
-        localStorage.setItem('gym_v41_logs', JSON.stringify(logs));
+        localStorage.setItem('gym_v42_logs', JSON.stringify(logs));
         
         ["inputW", "inputS", "inputSlope", "inputSpeed", "inputTime", "inputHR"].forEach(id => document.getElementById(id).value = '');
         
@@ -309,7 +329,7 @@
                     <td style="font-weight:700;">${l.item}</td>
                     <td>${l.weight}</td>
                     <td>${l.sets}</td>
-                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.2rem; padding:5px 15px; font-weight:bold;">✕</button></td>
+                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.3rem; padding:10px 20px; font-weight:bold;">✕</button></td>
                 </tr>`;
             } else {
                 return `<tr>
@@ -318,7 +338,7 @@
                     <td>${l.speed}</td>
                     <td>${l.time}</td>
                     <td>${l.hr}</td>
-                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.2rem; padding:5px 15px; font-weight:bold;">✕</button></td>
+                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.3rem; padding:10px 20px; font-weight:bold;">✕</button></td>
                 </tr>`;
             }
         }).join('');
@@ -370,7 +390,7 @@
                     const gLogs = logs.filter(l => l.date === d && l.group === g && !l.isCrdo);
                     return gLogs.reduce((sum, curr) => sum + (curr.weight * curr.sets), 0);
                 }),
-                barThickness: window.innerWidth < 768 ? 10 : 15
+                barThickness: window.innerWidth < 768 ? 12 : 15
             })).filter(ds => ds.data.some(v => v > 0));
         } else {
             const crdoItems = ["跑步機", "橢圓機", "登階機", "飛輪"];
@@ -385,7 +405,7 @@
                     const cLogs = logs.filter(l => l.date === d && l.isCrdo && l.item === item);
                     return cLogs.reduce((sum, curr) => sum + Number(curr.time), 0);
                 }),
-                barThickness: window.innerWidth < 768 ? 10 : 15
+                barThickness: window.innerWidth < 768 ? 12 : 15
             })).filter(ds => ds.data.some(v => v > 0));
         }
         
@@ -395,7 +415,7 @@
     function doCheckIn() {
         const today = getGymDate();
         checks[today] = true;
-        localStorage.setItem('gym_v41_checks', JSON.stringify(checks));
+        localStorage.setItem('gym_v42_checks', JSON.stringify(checks));
         alert("打卡成功！");
         renderCalendar();
         updateCheckBtn();
@@ -425,7 +445,7 @@
     function resetHistory() { document.getElementById('historyFilter').value = getGymDate(); renderHistory(); }
     function deleteLog(id) {
         logs = logs.filter(l => l.id !== id);
-        localStorage.setItem('gym_v41_logs', JSON.stringify(logs));
+        localStorage.setItem('gym_v42_logs', JSON.stringify(logs));
         renderHistory(); updateCharts();
     }
 </script>
