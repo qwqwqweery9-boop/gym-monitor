@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GYM MONITOR - V42 MOBILE PERFECT</title>
+    <title>GYM MONITOR - V52 ARMS UPDATED</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -13,103 +13,59 @@
             --cardio-color: #ef4444;
         }
         * { box-sizing: border-box; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; letter-spacing: 0.05em; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; overflow-y: auto; }
-        .main-layout { display: flex; width: 100%; max-width: 1500px; gap: 30px; align-items: flex-start; }
+        
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        .main-layout { display: flex; width: 100%; max-width: 1400px; gap: 30px; align-items: flex-start; }
         
         .sidebar { flex: 0 0 320px; display: flex; flex-direction: column; gap: 25px; position: sticky; top: 20px; }
-        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .btn-sync { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; display: block; }
-        .btn-sync:disabled { background: #222; color: #555; cursor: not-allowed; }
+        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; }
+        
+        .btn-sync { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; display: block; font-size: 1rem; }
+        .btn-sync:active { transform: scale(0.98); opacity: 0.9; }
 
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-weight: bold; color: var(--accent); }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 15px; text-align: center; }
+        .cal-grid { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 6px; margin-top: 15px; text-align: center; width: 100%; }
         .cal-item { aspect-ratio: 1; border-radius: 8px; background: #1a1d21; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--text-dim); border: 1px solid transparent; }
         .cal-item.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
         
-        /* 任務清單 - 電腦版樣式 */
-        .task-list { display: flex; flex-direction: column; gap: 28px; padding-top: 10px; }
-        .task-item { display:flex; align-items:center; gap:15px; cursor:pointer; }
-        .task-item input { width:20px; height:20px; accent-color:var(--accent); cursor:pointer; }
-        .task-item span { font-size: 1rem; color: var(--text-main); }
+        .task-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .task-table td { padding: 12px 0; vertical-align: middle; border-bottom: 1px solid #1a1d21; }
+        .task-check-col { width: 40px; }
+        .task-table input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--accent); }
+        .task-table span { font-size: 1.05rem; color: var(--text-main); line-height: 1.4; display: block; word-break: break-all; }
 
         .content { flex: 1; display: flex; flex-direction: column; gap: 25px; min-width: 0; }
         .section-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--accent); }
         .section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
 
-        .input-row { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; justify-content: flex-start; }
-        .input-group { display: flex; flex-direction: column; gap: 10px; text-align: center; }
-        .input-group label { font-size: 0.9rem; color: var(--text-dim); font-weight: bold; }
-        input, select { background: #1a1d21; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; text-align: center; outline: none; }
+        .input-row { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 120px; }
+        .input-group label { font-size: 0.85rem; color: var(--text-dim); font-weight: bold; text-align: center; }
+        input, select { background: #1a1d21; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; text-align: center; outline: none; width: 100%; }
 
-        .chart-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .chart-wrapper { height: 600px; width: 100%; }
+        .chart-wrapper { height: 500px; width: 100%; margin-top: 10px; }
+        .log-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .log-table th { padding: 12px; color: var(--text-dim); border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .log-table td { padding: 15px 10px; border-bottom: 1px solid #1a1d21; }
 
-        .history-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-toggle { background: #1a1d21; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; }
-        .btn-toggle.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        
-        table { width: 100%; border-collapse: collapse; text-align: center; }
-        th { padding: 12px; color: var(--text-dim); border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-        td { padding: 18px 12px; border-bottom: 1px solid #1a1d21; }
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; justify-content:center; align-items:center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; width:100%; max-width:450px; padding:25px; max-height:85vh; overflow-y:auto; position: relative; }
+        .routine-row { display:flex; gap:10px; align-items:center; margin-bottom:12px; background: #1a1d21; padding: 10px; border-radius: 12px; }
 
-        /* === 終極手機版優化設定 (V42) - 徹底解決版面跑掉問題 === */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .main-layout { flex-direction: column; gap: 20px; align-items: center; }
-            
-            /* 側邊欄與內容區全部佔滿寬度 */
-            .sidebar { flex: none; width: 100%; position: static; gap: 20px; align-items: center; }
-            .content { width: 100%; gap: 20px; align-items: center; }
-            
-            /* 面板寬度佔滿，加大上下間距 */
-            .panel { padding: 25px 15px; border-radius: 16px; width: 100%; }
-            
-            /* 重頭戲：任務清單徹底重寫 - 改為垂直垂直垂直排！ */
-            .task-list { gap: 30px; align-items: center; text-align: center; }
-            .task-item { flex-direction: column; gap: 15px; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; width: 80%; }
-            .task-item:last-child { border-bottom: none; padding-bottom: 0; }
-            .task-item input { width: 40px; height: 40px; } /* 超大勾選框，防手震 */
-            .task-item span { font-size: 1.15rem; font-weight: bold; }
-            
-            /* 輸入表單區垂直排列，加大間距與點擊高度 */
-            .input-row { flex-direction: column; align-items: stretch; gap: 20px; }
-            .input-group { width: 100%; gap: 10px; }
-            .input-group label { text-align: center; font-size: 1.05rem; }
-            
-            /* 解決 iPhone 自動縮放問題 (font-size:16px)，並加大高度 */
-            input, select { 
-                width: 100% !important; 
-                height: 56px; 
-                font-size: 16px !important; 
-                border-radius: 12px; 
-                text-align-last: center; /* 讓 select 文字也置中 */
-            }
-            
-            /* 重量/組數 比較短的在手機上維持並排，但中間空隙加大 */
-            #strengthFields, #cardioFields { flex-wrap: wrap; gap: 15px; width: 100%; justify-content: space-between; }
-            #strengthFields .input-group, #cardioFields .input-group { flex: 1; min-width: 45%; }
-            
-            /* 按鈕極致放大，好按防呆 */
-            .btn-sync { height: 60px; font-size: 1.25rem; margin-top: 10px; border-radius: 14px; }
-            
-            /* 控制區垂直排列，按鈕佔滿寬度 */
-            .chart-ctrl, .history-ctrl { flex-direction: column; align-items: stretch; gap: 18px; text-align: center; }
-            .chart-ctrl > div, .history-ctrl > div { flex-direction: column; width: 100%; gap: 18px; align-items: stretch !important; }
-            .toggle-group { display: flex; width: 100%; gap: 12px; }
-            .toggle-group .btn-toggle { flex: 1; padding: 15px; font-size: 1.1rem; text-align: center; }
-            
-            /* 圖表高度縮減適應手機畫面 */
-            .chart-wrapper { height: 350px; margin-top: 15px; }
-            
-            /* 表格加上絲滑滾動，字體調大保護眼睛 */
-            table { font-size: 1rem; display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; border-radius: 8px; }
-            th, td { padding: 18px 15px; }
-            
-            /* 打卡按鈕置中並加大 */
-            #checkInBtn { width: 90%; margin: 0 auto; height: 60px; font-size: 1.25rem; }
-            
-            /* 日曆月份切換按鈕加大 */
-            .cal-header button { padding: 15px 20px; font-size: 1.2rem; }
+            body { padding: 15px; overflow-y: auto; }
+            .main-layout { flex-direction: column; align-items: stretch; gap: 20px; }
+            .sidebar { position: static; flex: none; width: 100%; gap: 20px; }
+            .content { width: 100%; gap: 20px; }
+            .panel { padding: 20px; }
+            .cal-grid { gap: 4px; }
+            .input-row { flex-direction: column; align-items: stretch; gap: 15px; }
+            .input-group { width: 100%; }
+            input, select, .btn-sync { height: 56px; font-size: 16px !important; }
+            #strengthFields { display: flex !important; flex-direction: row !important; gap: 10px; width: 100%; }
+            #strengthFields .input-group { flex: 1; min-width: 0; }
+            .chart-wrapper { height: 320px; }
+            .log-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
         }
     </style>
 </head>
@@ -120,88 +76,57 @@
         <div class="panel">
             <button id="checkInBtn" class="btn-sync" onclick="doCheckIn()">⚡ 今日訓練打卡</button>
             <div class="cal-header">
-                <button onclick="changeMonth(-1)" style="background:none; border:none; color:var(--accent); cursor:pointer;">◀</button>
+                <button onclick="changeMonth(-1)" style="background:none; border:none; color:var(--accent); padding:10px; cursor:pointer;">◀</button>
                 <span id="calMonthDisplay">2026 / 04</span>
-                <button onclick="changeMonth(1)" style="background:none; border:none; color:var(--accent); cursor:pointer;">▶</button>
+                <button onclick="changeMonth(1)" style="background:none; border:none; color:var(--accent); padding:10px; cursor:pointer;">▶</button>
             </div>
-            <div class="cal-grid" id="calBox"></div>
+            <div id="calBox" class="cal-grid"></div>
         </div>
         
         <div class="panel">
-            <div class="section-header">任務清單</div>
-            <div class="task-list">
-                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">動態拉伸熱身</span></label>
-                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">目標肌群預熱</span></label>
-                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">核心穩定訓練</span></label>
-                <label class="task-item"><input type="checkbox"> <span style="font-size: 1.15rem;">冷身與拉伸</span></label>
+            <div class="section-header" style="justify-content: space-between;">
+                <span>🎯 今日專屬任務</span>
+                <span id="todayLabel" style="font-size:0.8rem; color:var(--text-dim);"></span>
             </div>
+            <table class="task-table">
+                <tbody id="dynamicTaskList"></tbody>
+            </table>
         </div>
     </div>
 
     <div class="content">
+        <button class="btn-sync" style="background:#1a1d21; color:var(--accent); border:1px solid var(--border); margin-bottom: 5px;" onclick="openRoutineModal()">📅 訓練菜單安排</button>
+
         <div class="panel">
             <div class="section-header">數據注入</div>
             <div class="input-row">
-                <div class="input-group">
-                    <label>日期</label>
-                    <input type="date" id="inputDate">
+                <div class="input-group"><label>日期</label><input type="date" id="inputDate" onchange="renderTaskList()"></div>
+                <div class="input-group"><label>肌群</label><select id="inputGroup" onchange="updateItems()"></select></div>
+                <div class="input-group"><label>項目</label><select id="inputItem"></select></div>
+                
+                <div id="strengthFields" style="display: flex; gap: 10px; width: 100%;">
+                    <div class="input-group"><label>重量 (kg)</label><input type="number" id="inputW"></div>
+                    <div class="input-group"><label>組數</label><input type="number" id="inputS"></div>
                 </div>
-                <div class="input-group">
-                    <label>訓練肌群</label>
-                    <select id="inputGroup" onchange="updateItems()"></select>
+                <div id="cardioFields" style="display: none; width: 100%;">
+                    <div class="input-group"><label>時長 (min)</label><input type="number" id="inputTime"></div>
                 </div>
-                <div class="input-group">
-                    <label>訓練項目</label>
-                    <select id="inputItem"></select>
-                </div>
-
-                <div id="strengthFields" style="display: flex; gap: 15px;">
-                    <div class="input-group"><label>重量 (kg)</label><input type="number" id="inputW" placeholder="0"></div>
-                    <div class="input-group"><label>組數</label><input type="number" id="inputS" placeholder="0"></div>
-                </div>
-
-                <div id="cardioFields" style="display: none; gap: 10px;">
-                    <div class="input-group"><label>坡度 (%)</label><input type="number" id="inputSlope" placeholder="0"></div>
-                    <div class="input-group"><label>速度</label><input type="number" id="inputSpeed" placeholder="0"></div>
-                    <div class="input-group"><label>時長 (min)</label><input type="number" id="inputTime" placeholder="0"></div>
-                    <div class="input-group"><label>心率</label><input type="number" id="inputHR" placeholder="0"></div>
-                </div>
-
-                <div class="input-group">
-                    <button class="btn-sync" onclick="saveRecord()">確認新增紀錄</button>
-                </div>
+                <button class="btn-sync" style="margin-top:10px;" onclick="saveRecord()">確認新增紀錄</button>
             </div>
         </div>
 
         <div class="panel">
-            <div class="chart-ctrl">
-                <div class="section-header" style="margin:0;">訓練數據監控</div>
-                <div style="display:flex; flex-direction:column; width:100%; gap:15px;">
-                    <div class="toggle-group" style="display:flex; width:100%;">
-                        <button id="chartModeStr" class="btn-toggle active" style="flex:1;" onclick="switchChartMode('str')">重量訓練</button>
-                        <button id="chartModeCrdo" class="btn-toggle" style="flex:1;" onclick="switchChartMode('crdo')">有氧運動</button>
-                    </div>
-                    <input type="date" id="chartRangeStart" onchange="updateCharts()">
-                </div>
+            <div class="section-header">訓練數據監控</div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button id="chartModeStr" class="btn-sync" style="flex:1; height:45px; padding:0;" onclick="switchChartMode('str')">重量訓練</button>
+                <button id="chartModeCrdo" class="btn-sync" style="flex:1; height:45px; padding:0; background:#222; color:#666;" onclick="switchChartMode('crdo')">有氧運動</button>
             </div>
             <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
         </div>
 
         <div class="panel">
-            <div class="history-ctrl">
-                <div class="section-header" style="margin:0;">歷史活動日誌</div>
-                <div style="display:flex; flex-direction:column; width:100%; gap:15px;">
-                    <div class="toggle-group" style="display:flex; width:100%;">
-                        <button id="histModeStr" class="btn-toggle active" style="flex:1;" onclick="switchHistMode('str')">重訓日誌</button>
-                        <button id="histModeCrdo" class="btn-toggle" style="flex:1;" onclick="switchHistMode('crdo')">有氧日誌</button>
-                    </div>
-                    <div style="display:flex; width:100%; gap:10px;">
-                        <input type="date" id="historyFilter" style="flex:2;" onchange="renderHistory()">
-                        <button class="btn-toggle" style="flex:1;" onclick="resetHistory()">查看今日</button>
-                    </div>
-                </div>
-            </div>
-            <table id="historyTable">
+            <div class="section-header">今日活動日誌</div>
+            <table class="log-table">
                 <thead id="historyHead"></thead>
                 <tbody id="historyBody"></tbody>
             </table>
@@ -209,244 +134,179 @@
     </div>
 </div>
 
+<div id="routineModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <span style="font-size:1.2rem; font-weight:bold; color:var(--accent);">每週訓練菜單</span>
+            <button onclick="closeRoutineModal()" style="background:none; border:none; color:#666; font-size:1.8rem; cursor:pointer;">✕</button>
+        </div>
+        <select id="routineDaySelect" onchange="renderRoutineEditor()" style="width:100%; margin-bottom:20px; font-weight:bold; color:var(--accent);">
+            <option value="1">星期一</option><option value="2">星期二</option><option value="3">星期三</option><option value="4">星期四</option><option value="5">星期五</option><option value="6">星期六</option><option value="0">星期日</option>
+        </select>
+        <div id="routineItemsList"></div>
+        <button class="btn-sync" style="background:#1a1d21; color:#888; border:1px dashed #333; margin-top:10px;" onclick="addRoutineItem()">+ 新增訓練目標</button>
+        <button id="saveRoutineBtn" class="btn-sync" style="margin-top:20px;" onclick="saveRoutine()">儲存此日菜單</button>
+    </div>
+</div>
+
 <script>
-    let logs = JSON.parse(localStorage.getItem('gym_v42_logs')) || [];
-    let checks = JSON.parse(localStorage.getItem('gym_v42_checks')) || {};
-    let currentCalDate = new Date();
-    let chartObj;
-    let histMode = 'str'; 
-    let chartMode = 'str';
+    let logs = JSON.parse(localStorage.getItem('gym_v52_logs')) || [];
+    let checks = JSON.parse(localStorage.getItem('gym_v52_checks')) || {};
+    let routineData = JSON.parse(localStorage.getItem('gym_v52_routine')) || {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[]};
+    let currentCalDate = new Date(), chartObj, chartMode = 'str';
 
-    const exerciseDB = {
-        "胸部": ["啞鈴上斜胸推", "Cable 飛鳥夾胸", "槓鈴臥推", "固定式機械胸推", "固定式機械飛鳥"],
-        "背部": ["引體向上", "滑輪下拉", "槓鈴划船", "坐姿划船", "單臂啞鈴划船"],
-        "腿部": ["槓鈴深蹲", "腿舉機", "保加利亞分腿蹲", "腿彎舉"],
-        "臀部": ["槓鈴臀推", "壺鈴搖擺", "羅馬尼亞硬舉"],
-        "肩膀": ["啞鈴肩推", "滑輪側平舉", "槓鈴站姿肩推", "反向飛鳥"],
-        "二頭": ["啞鈴二頭彎舉", "槓鈴彎舉", "錘式彎舉"],
-        "腹肌": ["懸垂舉腿", "機械式捲腹", "仰臥起坐", "俄羅斯轉體"],
-        "有氧": ["跑步機", "橢圓機", "登階機", "飛輪"]
+    // === V52: 更新後的肌群清單 ===
+    const exerciseDB = { 
+        "胸部": ["臥推", "啞鈴胸推"], 
+        "背部": ["下拉", "划船"], 
+        "腿部": ["深蹲", "腿推"], 
+        "肩膀": ["肩推", "側平舉"], 
+        "二頭": ["啞鈴彎舉", "槓鈴彎舉"], 
+        "三頭": ["法式推舉", "滑輪下壓"],
+        "腹肌": ["捲腹"], 
+        "有氧": ["跑步機", "飛輪"] 
     };
+    const allGroups = Object.keys(exerciseDB), daysZh = ["日", "一", "二", "三", "四", "五", "六"];
 
-    function formatDate(dateObj) {
-        const y = dateObj.getFullYear();
-        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const d = String(dateObj.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-    }
-
-    function getGymDate() {
-        return formatDate(new Date());
-    }
+    function formatDate(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0'); }
+    function getGymDate() { return formatDate(new Date()); }
 
     window.onload = () => {
-        const gymToday = getGymDate();
-        document.getElementById('inputDate').value = gymToday;
-        document.getElementById('historyFilter').value = gymToday;
-        document.getElementById('chartRangeStart').value = gymToday;
-        
-        const groupSelect = document.getElementById('inputGroup');
-        groupSelect.innerHTML = Object.keys(exerciseDB).map(g => `<option value="${g}">${g}</option>`).join('');
-        
-        updateItems();
-        renderCalendar();
-        updateCheckBtn();
-        initChart();
-        renderHistory();
+        document.getElementById('inputDate').value = getGymDate();
+        document.getElementById('inputGroup').innerHTML = allGroups.map(g => `<option value="${g}">${g}</option>`).join('');
+        updateItems(); renderCalendar(); updateCheckBtn(); initChart(); renderHistory(); renderTaskList();
     };
 
-    function updateItems() {
-        const group = document.getElementById('inputGroup').value;
-        const itemSelect = document.getElementById('inputItem');
-        itemSelect.innerHTML = exerciseDB[group].map(item => `<option value="${item}">${item}</option>`).join('');
+    function renderTaskList() {
+        const dStr = document.getElementById('inputDate').value || getGymDate();
+        const day = new Date(dStr + "T00:00:00").getDay();
+        document.getElementById('todayLabel').innerText = `星期${daysZh[day]}`;
+        const rt = routineData[day] || [], saved = JSON.parse(localStorage.getItem('gym_v52_tasks_' + dStr)) || {};
+        const tbody = document.getElementById('dynamicTaskList');
+        tbody.innerHTML = '';
+        const add = (id, txt) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="task-check-col"><input type="checkbox" id="t_${id}" onchange="saveTasks()" ${saved[id]?'checked':''}></td>
+                            <td class="task-text-col" onclick="document.getElementById('t_${id}').click()"><span>${txt}</span></td>`;
+            tbody.appendChild(tr);
+        };
+        add('w1', '動態拉伸熱身'); add('w2', '目標肌群預熱');
+        rt.forEach((r, i) => add('d_'+i, (r.group=='有氧'?`有氧訓練 ${r.val}分`:`重量訓練(${r.group}) ${r.val}組`)));
+        add('c', '冷身與拉伸');
+    }
 
-        const isCrdo = (group === "有氧");
-        document.getElementById('strengthFields').style.display = isCrdo ? 'none' : 'flex';
-        document.getElementById('cardioFields').style.display = isCrdo ? 'flex' : 'none';
+    function saveTasks() {
+        const dStr = document.getElementById('inputDate').value || getGymDate();
+        let s = {}; document.querySelectorAll('#dynamicTaskList input').forEach(c => s[c.id.replace('t_', '')] = c.checked);
+        localStorage.setItem('gym_v52_tasks_' + dStr, JSON.stringify(s));
+    }
+
+    function openRoutineModal() { document.getElementById('routineModal').style.display = 'flex'; renderRoutineEditor(); }
+    function closeRoutineModal() { document.getElementById('routineModal').style.display = 'none'; }
+    
+    function renderRoutineEditor() {
+        const day = document.getElementById('routineDaySelect').value;
+        const list = document.getElementById('routineItemsList');
+        list.innerHTML = '';
+        (routineData[day] || []).forEach(item => {
+            const row = document.createElement('div'); row.className = 'routine-row';
+            row.innerHTML = `<select style="flex:2;">${allGroups.map(g => `<option value="${g}" ${g==item.group?'selected':''}>${g}</option>`).join('')}</select>
+                             <input type="number" style="flex:1;" value="${item.val}">
+                             <button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>`;
+            list.appendChild(row);
+        });
+    }
+
+    function addRoutineItem() {
+        const row = document.createElement('div'); row.className = 'routine-row';
+        row.innerHTML = `<select style="flex:2;">${allGroups.map(g => `<option value="${g}">${g}</option>`).join('')}</select><input type="number" style="flex:1;"><button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>`;
+        document.getElementById('routineItemsList').appendChild(row);
+    }
+
+    function saveRoutine() {
+        const day = document.getElementById('routineDaySelect').value;
+        let items = [];
+        document.querySelectorAll('#routineItemsList .routine-row').forEach(r => {
+            const v = r.querySelector('input').value;
+            if(v) items.push({ group: r.querySelector('select').value, val: parseInt(v) });
+        });
+        routineData[day] = items;
+        localStorage.setItem('gym_v52_routine', JSON.stringify(routineData));
+        renderTaskList();
+        const btn = document.getElementById('saveRoutineBtn');
+        btn.innerText = "✅ 儲存成功"; btn.style.background = "#065f46";
+        setTimeout(()=>{ btn.innerText="儲存此日菜單"; btn.style.background="var(--accent)"; }, 1500);
+    }
+
+    function updateItems() {
+        const g = document.getElementById('inputGroup').value;
+        document.getElementById('inputItem').innerHTML = exerciseDB[g].map(i => `<option value="${i}">${i}</option>`).join('');
+        document.getElementById('strengthFields').style.display = (g=='有氧'?'none':'flex');
+        document.getElementById('cardioFields').style.display = (g=='有氧'?'flex':'none');
     }
 
     function saveRecord() {
-        const group = document.getElementById('inputGroup').value;
-        const item = document.getElementById('inputItem').value;
-        const date = document.getElementById('inputDate').value;
-        
-        let entry = { id: Date.now(), date, group, item, isCrdo: (group === "有氧") };
-
-        if (group === "有氧") {
-            entry.slope = document.getElementById('inputSlope').value || 0;
-            entry.speed = document.getElementById('inputSpeed').value || 0;
-            entry.time = document.getElementById('inputTime').value || 0;
-            entry.hr = document.getElementById('inputHR').value || 0;
-        } else {
-            entry.weight = parseFloat(document.getElementById('inputW').value || 0);
-            entry.sets = parseFloat(document.getElementById('inputS').value || 0);
-        }
-
-        logs.push(entry);
-        localStorage.setItem('gym_v42_logs', JSON.stringify(logs));
-        
-        ["inputW", "inputS", "inputSlope", "inputSpeed", "inputTime", "inputHR"].forEach(id => document.getElementById(id).value = '');
-        
-        renderHistory();
-        updateCharts();
+        const g = document.getElementById('inputGroup').value;
+        const d = document.getElementById('inputDate').value;
+        let e = { id: Date.now(), date: d, group: g, item: document.getElementById('inputItem').value, isCrdo: (g=='有氧') };
+        if(g=='有氧') e.time = document.getElementById('inputTime').value || 0; 
+        else { e.weight = document.getElementById('inputW').value || 0; e.sets = document.getElementById('inputS').value || 0; }
+        logs.push(e); localStorage.setItem('gym_v52_logs', JSON.stringify(logs)); renderHistory(); updateCharts();
+        alert("紀錄已儲存！");
     }
 
-    function switchChartMode(mode) {
-        chartMode = mode;
-        document.getElementById('chartModeStr').classList.toggle('active', mode === 'str');
-        document.getElementById('chartModeCrdo').classList.toggle('active', mode === 'crdo');
-        document.getElementById('chartModeCrdo').style.backgroundColor = mode === 'crdo' ? 'var(--cardio-color)' : '#1a1d21';
-        document.getElementById('chartModeCrdo').style.borderColor = mode === 'crdo' ? 'var(--cardio-color)' : 'var(--border)';
-        updateCharts();
-    }
-
-    function switchHistMode(mode) {
-        histMode = mode;
-        document.getElementById('histModeStr').classList.toggle('active', mode === 'str');
-        document.getElementById('histModeCrdo').classList.toggle('active', mode === 'crdo');
-        document.getElementById('histModeCrdo').style.backgroundColor = mode === 'crdo' ? 'var(--cardio-color)' : '#1a1d21';
-        document.getElementById('histModeCrdo').style.borderColor = mode === 'crdo' ? 'var(--cardio-color)' : 'var(--border)';
-        renderHistory();
+    function switchChartMode(m) {
+        chartMode = m;
+        document.getElementById('chartModeStr').style.background = (m=='str'?'var(--accent)':'#222');
+        document.getElementById('chartModeStr').style.color = (m=='str'?'#fff':'#666');
+        document.getElementById('chartModeCrdo').style.background = (m=='crdo'?'var(--cardio-color)':'#222');
+        document.getElementById('chartModeCrdo').style.color = (m=='crdo'?'#fff':'#666');
+        updateCharts(); renderHistory();
     }
 
     function renderHistory() {
-        const filter = document.getElementById('historyFilter').value;
-        const head = document.getElementById('historyHead');
-        const body = document.getElementById('historyBody');
-        
-        if (histMode === 'str') {
-            head.innerHTML = `<tr><th>肌群</th><th>項目</th><th>kg</th><th>組</th><th>操作</th></tr>`;
-        } else {
-            head.innerHTML = `<tr><th>項目</th><th>坡度</th><th>速</th><th>min</th><th>心率</th><th>操作</th></tr>`;
-        }
-
-        const filtered = logs.filter(l => l.date === filter && l.isCrdo === (histMode === 'crdo')).reverse();
-        
-        body.innerHTML = filtered.map(l => {
-            if (histMode === 'str') {
-                return `<tr>
-                    <td style="color:var(--accent); font-weight:bold;">${l.group}</td>
-                    <td style="font-weight:700;">${l.item}</td>
-                    <td>${l.weight}</td>
-                    <td>${l.sets}</td>
-                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.3rem; padding:10px 20px; font-weight:bold;">✕</button></td>
-                </tr>`;
-            } else {
-                return `<tr>
-                    <td style="font-weight:700; color:var(--cardio-color);">${l.item}</td>
-                    <td>${l.slope}</td>
-                    <td>${l.speed}</td>
-                    <td>${l.time}</td>
-                    <td>${l.hr}</td>
-                    <td><button onclick="deleteLog(${l.id})" style="color:var(--cardio-color); background:none; border:none; cursor:pointer; font-size:1.3rem; padding:10px 20px; font-weight:bold;">✕</button></td>
-                </tr>`;
-            }
+        const f = document.getElementById('inputDate').value;
+        const h = document.getElementById('historyHead');
+        h.innerHTML = (chartMode=='str'?'<tr><th>肌群</th><th>kg</th><th>組</th></tr>':'<tr><th>項目</th><th>min</th></tr>');
+        document.getElementById('historyBody').innerHTML = logs.filter(l => l.date === f && l.isCrdo === (chartMode=='crdo')).reverse().map(l => {
+            return chartMode=='str' ? `<tr><td>${l.group}</td><td>${l.weight}</td><td>${l.sets}</td></tr>` : `<tr><td>${l.item}</td><td>${l.time}</td></tr>`;
         }).join('');
     }
 
     function initChart() {
-        const ctx = document.getElementById('mainChart').getContext('2d');
-        chartObj = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: [], datasets: [] },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: {
-                    y: { 
-                        min: 80, max: 800, 
-                        ticks: { color: '#666', stepSize: 80 }, 
-                        grid: { color: '#222' }
-                    },
-                    x: { ticks: { color: '#888' }, grid: { display: false } }
-                },
-                plugins: { legend: { display: false } }
-            }
+        chartObj = new Chart(document.getElementById('mainChart').getContext('2d'), { 
+            type: 'bar', data: { labels: [], datasets: [] }, 
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 800, grid: { color: '#222' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } 
         });
         updateCharts();
     }
 
     function updateCharts() {
-        const endDateInput = document.getElementById('chartRangeStart').value;
-        let endDateObj = endDateInput ? new Date(endDateInput + "T00:00:00") : new Date(getGymDate() + "T00:00:00");
-        const dates = [];
-        for(let i=4; i>=0; i--) {
-            const d = new Date(endDateObj);
-            d.setDate(d.getDate() - i);
-            dates.push(formatDate(d));
-        }
-        
-        const alphas = [0.10, 0.25, 0.50, 0.75, 1.0];
-
-        if (chartMode === 'str') {
-            const strGroups = ["胸部", "背部", "腿部", "肩膀", "臀部"];
-            chartObj.options.scales.y.min = 80;
-            chartObj.options.scales.y.max = 800;
-            chartObj.options.scales.y.ticks.stepSize = 80;
-            chartObj.data.labels = strGroups;
-            chartObj.data.datasets = dates.map((d, i) => ({
-                label: d.slice(5),
-                backgroundColor: `rgba(13, 148, 136, ${alphas[i]})`,
-                data: strGroups.map(g => {
-                    const gLogs = logs.filter(l => l.date === d && l.group === g && !l.isCrdo);
-                    return gLogs.reduce((sum, curr) => sum + (curr.weight * curr.sets), 0);
-                }),
-                barThickness: window.innerWidth < 768 ? 12 : 15
-            })).filter(ds => ds.data.some(v => v > 0));
+        const today = getGymDate();
+        let dates = []; for(let i=4; i>=0; i--) { let d = new Date(today + "T00:00:00"); d.setDate(d.getDate()-i); dates.push(formatDate(d)); }
+        if(chartMode=='str') {
+            const grps = ["胸部", "背部", "腿部", "肩膀", "二頭", "三頭"]; chartObj.options.scales.y.max = 800; chartObj.data.labels = grps;
+            chartObj.data.datasets = dates.map((d, i) => ({ label: d, backgroundColor: `rgba(13, 148, 136, ${(i+1)*0.2})`, data: grps.map(g => logs.filter(l => l.date==d && l.group==g).reduce((s, c) => s + (Number(c.weight)*Number(c.sets)), 0)) }));
         } else {
-            const crdoItems = ["跑步機", "橢圓機", "登階機", "飛輪"];
-            chartObj.options.scales.y.min = 0;
-            chartObj.options.scales.y.max = 120;
-            chartObj.options.scales.y.ticks.stepSize = 20; 
-            chartObj.data.labels = crdoItems;
-            chartObj.data.datasets = dates.map((d, i) => ({
-                label: d.slice(5),
-                backgroundColor: `rgba(239, 68, 68, ${alphas[i]})`, 
-                data: crdoItems.map(item => {
-                    const cLogs = logs.filter(l => l.date === d && l.isCrdo && l.item === item);
-                    return cLogs.reduce((sum, curr) => sum + Number(curr.time), 0);
-                }),
-                barThickness: window.innerWidth < 768 ? 12 : 15
-            })).filter(ds => ds.data.some(v => v > 0));
+            const itms = ["跑步機"]; chartObj.options.scales.y.max = 120; chartObj.data.labels = itms;
+            chartObj.data.datasets = dates.map((d, i) => ({ label: d, backgroundColor: `rgba(239, 68, 68, ${(i+1)*0.2})`, data: itms.map(it => logs.filter(l => l.date==d && l.isCrdo).reduce((s, c) => s + Number(c.time), 0)) }));
         }
-        
         chartObj.update();
     }
 
-    function doCheckIn() {
-        const today = getGymDate();
-        checks[today] = true;
-        localStorage.setItem('gym_v42_checks', JSON.stringify(checks));
-        alert("打卡成功！");
-        renderCalendar();
-        updateCheckBtn();
-    }
-    function updateCheckBtn() {
-        const btn = document.getElementById('checkInBtn');
-        if(checks[getGymDate()]) { btn.disabled = true; btn.innerText = "✅ 今日已打卡"; }
-    }
-    function changeMonth(step) { currentCalDate.setMonth(currentCalDate.getMonth() + step); renderCalendar(); }
+    function doCheckIn() { const t = getGymDate(); checks[t] = true; localStorage.setItem('gym_v52_checks', JSON.stringify(checks)); renderCalendar(); updateCheckBtn(); }
+    function updateCheckBtn() { const b = document.getElementById('checkInBtn'); if(checks[getGymDate()]) { b.disabled = true; b.innerText = "✅ 今日已打卡"; } }
+    function changeMonth(s) { currentCalDate.setMonth(currentCalDate.getMonth()+s); renderCalendar(); }
     function renderCalendar() {
-        const grid = document.getElementById('calBox');
-        grid.innerHTML = ['日','一','二','三','四','五','六'].map(w => `<div style="font-size:0.7rem; color:#444;">${w}</div>`).join('');
-        const year = currentCalDate.getFullYear(), month = currentCalDate.getMonth();
-        document.getElementById('calMonthDisplay').innerText = `${year} / ${String(month + 1).padStart(2, '0')}`;
-        const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-        const todayStr = getGymDate();
-        for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateStr = formatDate(new Date(year, month, d));
-            const div = document.createElement('div');
-            div.className = `cal-item ${dateStr === todayStr ? 'active' : ''}`;
-            let mark = checks[dateStr] ? '<span class="v-mark">v</span>' : (dateStr < todayStr ? '<span class="x-mark">x</span>' : "");
-            div.innerHTML = `<span>${d}</span>${mark}`;
-            grid.appendChild(div);
+        const g = document.getElementById('calBox'); g.innerHTML = ['日','一','二','三','四','五','六'].map(w => `<div style="font-size:0.7rem; color:#444;">${w}</div>`).join('');
+        const y = currentCalDate.getFullYear(), m = currentCalDate.getMonth(), first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate(), today = getGymDate();
+        for(let i=0; i<first; i++) g.appendChild(document.createElement('div'));
+        for(let d=1; d<=days; d++) {
+            const s = formatDate(new Date(y, m, d)), div = document.createElement('div');
+            div.className = `cal-item ${s === today ? 'active' : ''}`;
+            div.innerHTML = `<span>${d}</span>${checks[s]?'<span style="color:var(--accent); font-weight:bold;">v</span>':(s<today?'<span style="color:#ef4444">x</span>':'')}`;
+            g.appendChild(div);
         }
-    }
-    function resetHistory() { document.getElementById('historyFilter').value = getGymDate(); renderHistory(); }
-    function deleteLog(id) {
-        logs = logs.filter(l => l.id !== id);
-        localStorage.setItem('gym_v42_logs', JSON.stringify(logs));
-        renderHistory(); updateCharts();
     }
 </script>
 </body>
