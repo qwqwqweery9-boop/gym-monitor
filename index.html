@@ -3,29 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GYM MONITOR - V67 SPACING MASTER</title>
+    <title>GYM MONITOR - V68 TABLE PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
-            --bg: #050505; 
-            --panel: #0d0f11; 
-            --border: #1a1c1e;
-            --text-main: #b1b5bb;
-            --text-dim: #4b5563;
-            --accent: #0d9488; 
-            --plum: #6C3365;   
+            --bg: #050505; --panel: #0d0f11; --border: #1a1c1e;
+            --text-main: #b1b5bb; --text-dim: #4b5563;
+            --accent: #0d9488; --plum: #6C3365;   
         }
         * { box-sizing: border-box; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; letter-spacing: 0.05em; }
         
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         .main-layout { display: flex; width: 100%; max-width: 1400px; gap: 30px; align-items: flex-start; }
         
-        /* 側邊欄 */
         .sidebar { flex: 0 0 350px; display: flex; flex-direction: column; gap: 25px; position: sticky; top: 20px; }
         .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); width: 100%; }
         
         .btn-sync { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; display: block; font-size: 1rem; }
-        .btn-sync:active { transform: scale(0.97); }
 
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-weight: bold; color: var(--accent); }
         .cal-grid { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 6px; margin-top: 15px; text-align: center; width: 100%; }
@@ -35,7 +29,6 @@
         .section-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--accent) !important; }
         .section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
 
-        /* 主內容區 */
         .content { flex: 1; display: flex; flex-direction: column; gap: 25px; min-width: 0; }
         input, select { background: #121416; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; text-align: center; outline: none; width: 100%; }
 
@@ -46,49 +39,39 @@
 
         .chart-wrapper { height: 450px; width: 100%; }
         
-        /* === V67: 活動日誌表格 平均分散優化 === */
-        .log-table-container { width: 100%; overflow-x: hidden; }
+        /* === V68: 活動日誌表格 平均分散核心 CSS === */
+        .log-table-container { width: 100%; }
         .log-table { 
             width: 100%; 
             border-collapse: collapse; 
-            table-layout: fixed; /* 強制欄位寬度平均 */
+            table-layout: fixed; /* 強制所有欄位平均分佈寬度 */
+        }
+        .log-table th, .log-table td { 
+            width: 20%; /* 5 欄平分 100% */
             text-align: center; 
+            padding: 15px 5px;
+            border-bottom: 1px solid #1a1c1e;
         }
-        .log-table th { 
-            padding: 12px 5px; 
-            color: var(--text-dim); 
-            border-bottom: 1px solid var(--border); 
-            font-size: 0.85rem; 
-            font-weight: bold;
-        }
-        .log-table td { 
-            padding: 18px 5px; 
-            border-bottom: 1px solid #121416; 
-            font-size: 0.95rem;
-            word-break: break-all;
-        }
+        .log-table th { color: var(--text-dim); font-size: 0.85rem; }
+        .log-table td { font-size: 0.95rem; word-break: break-all; }
         .btn-del { color: #822727; background: none; border: none; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
 
-        /* 有氧動態欄位 */
         #dynamicCardioFields { display: none; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; width: 100%; }
-        .cardio-field-group { display: flex; flex-direction: column; }
-
-        /* 彈窗修正 */
+        
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; justify-content:center; align-items:center; padding: 15px; backdrop-filter: blur(5px); }
         .modal-content { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; width:100%; max-width:500px; padding:25px; max-height:90vh; display: flex; flex-direction: column; }
-        #routineItemsList { flex: 1; overflow-y: auto; margin: 15px 0; padding-right: 5px; }
+        #routineItemsList { flex: 1; overflow-y: auto; margin: 15px 0; }
         .routine-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; background: #121416; padding: 12px; border-radius: 12px; }
 
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; }
             .sidebar { position: static; width: 100%; flex: none; }
         }
-
         @media (max-width: 768px) {
             body { padding: 10px; }
             #dynamicCardioFields { grid-template-columns: repeat(2, 1fr); }
             .chart-wrapper { height: 320px; }
-            .log-table th, .log-table td { font-size: 0.8rem; padding: 12px 2px; }
+            .log-table th, .log-table td { font-size: 0.75rem; padding: 10px 2px; }
         }
     </style>
 </head>
@@ -129,22 +112,10 @@
                 </div>
 
                 <div id="dynamicCardioFields">
-                    <div class="cardio-field-group" id="slopeField">
-                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">坡度</label>
-                        <input type="number" id="inputSlope">
-                    </div>
-                    <div class="cardio-field-group" id="speedField">
-                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">速度</label>
-                        <input type="number" id="inputSpeed">
-                    </div>
-                    <div class="cardio-field-group" id="repsField">
-                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">次數</label>
-                        <input type="number" id="inputReps">
-                    </div>
-                    <div class="cardio-field-group" id="timeField">
-                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">分鐘</label>
-                        <input type="number" id="inputTime">
-                    </div>
+                    <div class="cardio-field-group" id="slopeField"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">坡度</label><input type="number" id="inputSlope"></div>
+                    <div class="cardio-field-group" id="speedField"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">速度</label><input type="number" id="inputSpeed"></div>
+                    <div class="cardio-field-group" id="repsField"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">次數</label><input type="number" id="inputReps"></div>
+                    <div class="cardio-field-group" id="timeField"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">分鐘</label><input type="number" id="inputTime"></div>
                 </div>
                 
                 <button id="mainConfirmBtn" class="btn-sync" onclick="saveRecord()">確認新增紀錄</button>
@@ -188,15 +159,15 @@
         </div>
         <select id="routineDaySelect" onchange="renderRoutineEditor()" style="margin-top:20px; font-weight:bold; color:var(--accent);"></select>
         <div id="routineItemsList"></div>
-        <button onclick="addRoutineItem()" style="width:100%; background:transparent; color:var(--text-dim); border:1px dashed var(--border); padding:15px; border-radius:12px; cursor:pointer; font-weight:bold;">+ 新增訓練項目</button>
+        <button onclick="addRoutineItem()" style="width:100%; background:transparent; color:var(--text-dim); border:1px dashed var(--border); padding: 15px; border-radius: 12px; cursor:pointer; font-weight:bold;">+ 新增訓練項目</button>
         <button id="saveRoutineBtn" class="btn-sync" style="margin-top:20px;" onclick="saveRoutine()">儲存此日菜單</button>
     </div>
 </div>
 
 <script>
-    let logs = JSON.parse(localStorage.getItem('gym_v67_logs')) || [];
-    let checks = JSON.parse(localStorage.getItem('gym_v67_checks')) || {};
-    let routineData = JSON.parse(localStorage.getItem('gym_v67_routine')) || {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[]};
+    let logs = JSON.parse(localStorage.getItem('gym_v68_logs')) || [];
+    let checks = JSON.parse(localStorage.getItem('gym_v68_checks')) || {};
+    let routineData = JSON.parse(localStorage.getItem('gym_v68_routine')) || {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[]};
     let currentCalDate = new Date(), chartObj, activeMode = 'str';
 
     const exerciseDB = { 
@@ -274,11 +245,10 @@
             e.weight = document.getElementById('inputW').value || 0;
             e.sets = document.getElementById('inputS').value || 0;
         }
-        logs.push(e); localStorage.setItem('gym_v67_logs', JSON.stringify(logs)); renderHistory(); updateCharts();
+        logs.push(e); localStorage.setItem('gym_v68_logs', JSON.stringify(logs)); renderHistory(); updateCharts();
         alert("紀錄已儲存！");
     }
 
-    // === V67: 歷史日誌欄位 平均分散實作 ===
     function renderHistory() {
         const f = document.getElementById('historyFilter').value;
         const h = document.getElementById('historyHead');
@@ -287,7 +257,7 @@
         if(activeMode === 'str') {
             h.innerHTML = `<tr><th>肌群</th><th>項目</th><th>kg</th><th>組數</th><th>操作</th></tr>`;
         } else {
-            h.innerHTML = `<tr><th>項目</th><th>數據/坡度</th><th>速度/次</th><th>分鐘</th><th>操作</th></tr>`;
+            h.innerHTML = `<tr><th>項目</th><th>數據</th><th>速度/次</th><th>分鐘</th><th>操作</th></tr>`;
         }
         
         const filtered = logs.filter(l => l.date === f && l.isCrdo === (activeMode === 'crdo')).reverse();
@@ -327,7 +297,7 @@
     function renderTaskList() {
         const dStr = document.getElementById('inputDate').value || getGymDate();
         const day = new Date(dStr + "T00:00:00").getDay();
-        const rt = routineData[day] || [], saved = JSON.parse(localStorage.getItem('gym_v67_tasks_' + dStr)) || {};
+        const rt = routineData[day] || [], saved = JSON.parse(localStorage.getItem('gym_v68_tasks_' + dStr)) || {};
         const tbody = document.getElementById('dynamicTaskList'); tbody.innerHTML = '';
         const add = (id, txt) => {
             const tr = document.createElement('tr');
@@ -343,10 +313,12 @@
     function saveTasks() {
         const dStr = document.getElementById('inputDate').value || getGymDate();
         let s = {}; document.querySelectorAll('#dynamicTaskList input').forEach(c => s[c.id.replace('t_', '')] = c.checked);
-        localStorage.setItem('gym_v67_tasks_' + dStr, JSON.stringify(s));
+        localStorage.setItem('gym_v68_tasks_' + dStr, JSON.stringify(s));
     }
     function openRoutineModal() { document.getElementById('routineModal').style.display = 'flex'; renderRoutineEditor(); }
     function closeRoutineModal() { document.getElementById('routineModal').style.display = 'none'; }
+    
+    // === V68 修復選單重複項 Bug ===
     function renderRoutineEditor() {
         const day = document.getElementById('routineDaySelect').value;
         const list = document.getElementById('routineItemsList'); list.innerHTML = '';
@@ -360,9 +332,12 @@
     }
     function addRoutineItem() {
         const row = document.createElement('div'); row.className = 'routine-row';
-        row.innerHTML = `<select style="flex:2;">${allGroups.map(g => `<option value="${g}">胸部</option><option value="背部">背部</option><option value="腿部">腿部</option><option value="肩膀">肩膀</option><option value="二頭">二頭</option><option value="有氧">有氧</option>`).join('')}</select><input type="number" style="flex:1;"><button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>`;
+        row.innerHTML = `<select style="flex:2;">${allGroups.map(g => `<option value="${g}">${g}</option>`).join('')}</select>
+                         <input type="number" style="flex:1;">
+                         <button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>`;
         document.getElementById('routineItemsList').appendChild(row);
     }
+    
     function saveRoutine() {
         const day = document.getElementById('routineDaySelect').value;
         let items = [];
@@ -370,13 +345,13 @@
             const v = r.querySelector('input').value;
             if(v) items.push({ group: r.querySelector('select').value, val: parseInt(v) });
         });
-        routineData[day] = items; localStorage.setItem('gym_v67_routine', JSON.stringify(routineData));
+        routineData[day] = items; localStorage.setItem('gym_v68_routine', JSON.stringify(routineData));
         renderTaskList();
         const btn = document.getElementById('saveRoutineBtn');
         btn.innerText = "✅ 儲存成功"; btn.style.background = "#065f46";
         setTimeout(()=>{ btn.innerText="儲存此日菜單"; btn.style.background="var(--accent)"; }, 1500);
     }
-    function doCheckIn() { const t = getGymDate(); checks[t] = true; localStorage.setItem('gym_v67_checks', JSON.stringify(checks)); renderCalendar(); updateCheckBtn(); }
+    function doCheckIn() { const t = getGymDate(); checks[t] = true; localStorage.setItem('gym_v68_checks', JSON.stringify(checks)); renderCalendar(); updateCheckBtn(); }
     function updateCheckBtn() { const b = document.getElementById('checkInBtn'); if(checks[getGymDate()]) { b.disabled = true; b.innerText = "✅ 今日已打卡"; } }
     function changeMonth(s) { currentCalDate.setMonth(currentCalDate.getMonth()+s); renderCalendar(); }
     function renderCalendar() {
@@ -391,7 +366,7 @@
         }
     }
     function resetHistory() { document.getElementById('historyFilter').value = getGymDate(); renderHistory(); }
-    function deleteLog(id) { if(!confirm("確定要刪除這筆紀錄嗎？")) return; logs = logs.filter(l => l.id !== id); localStorage.setItem('gym_v67_logs', JSON.stringify(logs)); renderHistory(); updateCharts(); }
+    function deleteLog(id) { if(!confirm("確定要刪除這筆紀錄嗎？")) return; logs = logs.filter(l => l.id !== id); localStorage.setItem('gym_v68_logs', JSON.stringify(logs)); renderHistory(); updateCharts(); }
 </script>
 </body>
 </html>
