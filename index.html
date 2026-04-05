@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GYM MONITOR - V62 MODAL FIX</title>
+    <title>GYM MONITOR - V67 SPACING MASTER</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -12,33 +12,33 @@
             --border: #1a1c1e;
             --text-main: #b1b5bb;
             --text-dim: #4b5563;
-            --accent: #0d9488; /* 湖水綠 */
-            --plum: #6C3365;   /* 深梅紫 */
+            --accent: #0d9488; 
+            --plum: #6C3365;   
         }
         * { box-sizing: border-box; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; letter-spacing: 0.05em; }
         
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         .main-layout { display: flex; width: 100%; max-width: 1400px; gap: 30px; align-items: flex-start; }
         
-        .sidebar { flex: 0 0 320px; display: flex; flex-direction: column; gap: 25px; position: sticky; top: 20px; }
+        /* 側邊欄 */
+        .sidebar { flex: 0 0 350px; display: flex; flex-direction: column; gap: 25px; position: sticky; top: 20px; }
         .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); width: 100%; }
         
         .btn-sync { width: 100%; background: var(--accent); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; display: block; font-size: 1rem; }
         .btn-sync:active { transform: scale(0.97); }
 
-        /* 日曆區固化 */
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-weight: bold; color: var(--accent); }
         .cal-grid { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 6px; margin-top: 15px; text-align: center; width: 100%; }
         .cal-item { aspect-ratio: 1; border-radius: 8px; background: #121416; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--text-dim); }
         .cal-item.active { border: 1px solid var(--accent); color: var(--accent); background: rgba(13, 148, 136, 0.05); }
 
-        .section-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--accent); }
+        .section-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--accent) !important; }
         .section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
 
+        /* 主內容區 */
         .content { flex: 1; display: flex; flex-direction: column; gap: 25px; min-width: 0; }
         input, select { background: #121416; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; text-align: center; outline: none; width: 100%; }
 
-        /* 監控區切換鈕 */
         .toggle-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-toggle { flex: 1; height: 45px; background: #1a1c1e; color: #555; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-toggle.active.str { background: var(--accent) !important; color: #fff !important; }
@@ -46,26 +46,49 @@
 
         .chart-wrapper { height: 450px; width: 100%; }
         
-        .log-table { width: 100%; border-collapse: collapse; text-align: center; }
-        .log-table td { padding: 15px 10px; border-bottom: 1px solid #121416; }
+        /* === V67: 活動日誌表格 平均分散優化 === */
+        .log-table-container { width: 100%; overflow-x: hidden; }
+        .log-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            table-layout: fixed; /* 強制欄位寬度平均 */
+            text-align: center; 
+        }
+        .log-table th { 
+            padding: 12px 5px; 
+            color: var(--text-dim); 
+            border-bottom: 1px solid var(--border); 
+            font-size: 0.85rem; 
+            font-weight: bold;
+        }
+        .log-table td { 
+            padding: 18px 5px; 
+            border-bottom: 1px solid #121416; 
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+        .btn-del { color: #822727; background: none; border: none; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
 
-        /* === 訓練菜單 Modal 大整容 === */
+        /* 有氧動態欄位 */
+        #dynamicCardioFields { display: none; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; width: 100%; }
+        .cardio-field-group { display: flex; flex-direction: column; }
+
+        /* 彈窗修正 */
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; justify-content:center; align-items:center; padding: 15px; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; width:100%; max-width:480px; padding:25px; max-height:90vh; display: flex; flex-direction: column; }
+        .modal-content { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; width:100%; max-width:500px; padding:25px; max-height:90vh; display: flex; flex-direction: column; }
         #routineItemsList { flex: 1; overflow-y: auto; margin: 15px 0; padding-right: 5px; }
-        .routine-row { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: #121416; padding: 12px; border-radius: 12px; width: 100%; }
-        .routine-row select { flex: 2; min-width: 0; }
-        .routine-row input { flex: 1; min-width: 0; }
-        .btn-modal-close { background:none; border:none; color:var(--text-dim); font-size:1.8rem; cursor:pointer; }
-        .btn-add-dashed { width:100%; background:transparent; color:var(--text-dim); border: 1px dashed var(--border); padding: 15px; border-radius: 12px; cursor:pointer; font-weight: bold; }
+        .routine-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; background: #121416; padding: 12px; border-radius: 12px; }
+
+        @media (max-width: 1024px) {
+            .main-layout { flex-direction: column; }
+            .sidebar { position: static; width: 100%; flex: none; }
+        }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .main-layout { flex-direction: column; gap: 15px; }
-            .sidebar, .content { width: 100%; position: static; }
-            .modal-content { padding: 20px; width: 95%; }
+            #dynamicCardioFields { grid-template-columns: repeat(2, 1fr); }
             .chart-wrapper { height: 320px; }
-            .log-table { display: block; overflow-x: auto; }
+            .log-table th, .log-table td { font-size: 0.8rem; padding: 12px 2px; }
         }
     </style>
 </head>
@@ -97,17 +120,33 @@
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <div style="flex:1; min-width:130px;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">日期</label><input type="date" id="inputDate" onchange="renderTaskList()"></div>
                     <div style="flex:1; min-width:130px;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">肌群</label><select id="inputGroup" onchange="updateItems()"></select></div>
-                    <div style="flex:1; min-width:130px;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">項目</label><select id="inputItem"></select></div>
+                    <div style="flex:1; min-width:130px;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">項目</label><select id="inputItem" onchange="handleItemChange()"></select></div>
                 </div>
+                
                 <div id="strengthFields" style="display: flex; gap: 10px;">
                     <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">重量 (kg)</label><input type="number" id="inputW"></div>
                     <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">組數</label><input type="number" id="inputS"></div>
                 </div>
-                <div id="cardioFields" style="display: none; flex-wrap: wrap; gap: 10px;">
-                    <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">坡度</label><input type="number" id="inputSlope"></div>
-                    <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">速度</label><input type="number" id="inputSpeed"></div>
-                    <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">分鐘</label><input type="number" id="inputTime"></div>
+
+                <div id="dynamicCardioFields">
+                    <div class="cardio-field-group" id="slopeField">
+                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">坡度</label>
+                        <input type="number" id="inputSlope">
+                    </div>
+                    <div class="cardio-field-group" id="speedField">
+                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">速度</label>
+                        <input type="number" id="inputSpeed">
+                    </div>
+                    <div class="cardio-field-group" id="repsField">
+                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">次數</label>
+                        <input type="number" id="inputReps">
+                    </div>
+                    <div class="cardio-field-group" id="timeField">
+                        <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:5px;">分鐘</label>
+                        <input type="number" id="inputTime">
+                    </div>
                 </div>
+                
                 <button id="mainConfirmBtn" class="btn-sync" onclick="saveRecord()">確認新增紀錄</button>
             </div>
         </div>
@@ -131,7 +170,12 @@
                 <input type="date" id="historyFilter" style="width:140px; height:35px; font-size:0.8rem;" onchange="renderHistory()">
                 <button class="btn-toggle" style="height:35px; padding:0 10px; background:#121416; color:var(--accent);" onclick="resetHistory()">今日</button>
             </div>
-            <table class="log-table"><thead id="historyHead"></thead><tbody id="historyBody"></tbody></table>
+            <div class="log-table-container">
+                <table class="log-table">
+                    <thead id="historyHead"></thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -140,28 +184,30 @@
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:1.2rem; font-weight:bold; color:var(--accent);">每週訓練菜單</span>
-            <button onclick="closeRoutineModal()" class="btn-modal-close">✕</button>
+            <button onclick="closeRoutineModal()" style="background:none; border:none; color:var(--text-dim); font-size:1.8rem; cursor:pointer;">✕</button>
         </div>
-        
         <select id="routineDaySelect" onchange="renderRoutineEditor()" style="margin-top:20px; font-weight:bold; color:var(--accent);"></select>
-        
         <div id="routineItemsList"></div>
-        
-        <button class="btn-add-dashed" onclick="addRoutineItem()">+ 新增訓練項目</button>
+        <button onclick="addRoutineItem()" style="width:100%; background:transparent; color:var(--text-dim); border:1px dashed var(--border); padding:15px; border-radius:12px; cursor:pointer; font-weight:bold;">+ 新增訓練項目</button>
         <button id="saveRoutineBtn" class="btn-sync" style="margin-top:20px;" onclick="saveRoutine()">儲存此日菜單</button>
     </div>
 </div>
 
 <script>
-    let logs = JSON.parse(localStorage.getItem('gym_v62_logs')) || [];
-    let checks = JSON.parse(localStorage.getItem('gym_v62_checks')) || {};
-    let routineData = JSON.parse(localStorage.getItem('gym_v62_routine')) || {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[]};
+    let logs = JSON.parse(localStorage.getItem('gym_v67_logs')) || [];
+    let checks = JSON.parse(localStorage.getItem('gym_v67_checks')) || {};
+    let routineData = JSON.parse(localStorage.getItem('gym_v67_routine')) || {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[]};
     let currentCalDate = new Date(), chartObj, activeMode = 'str';
 
     const exerciseDB = { 
-        "胸部": ["臥推", "啞鈴胸推"], "背部": ["下拉", "划船"], "腿部": ["深蹲", "腿推"], "肩膀": ["肩推", "側平舉"], 
-        "二頭": ["啞鈴彎舉", "槓鈴彎舉"], "三頭": ["法式推舉", "滑輪下壓"], "腹肌": ["捲腹"], 
-        "有氧": ["跑步機", "橢圓機", "登階機", "飛輪", "划船機"] 
+        "胸部": ["槓鈴臥推", "啞鈴臥推", "上斜槓鈴臥推", "上斜啞鈴臥推", "下斜臥推", "啞鈴飛鳥", "機械夾胸", "滑輪飛鳥", "雙槓支撐", "俯臥撐"], 
+        "背部": ["引體向上", "滑輪下拉", "槓鈴划船", "啞鈴划船", "座姿划船", "T桿划船", "硬舉", "單臂啞鈴划船", "下背伸展", "直臂下壓"], 
+        "腿部": ["槓鈴深蹲", "腿推機", "腿部伸展", "腿後彎舉", "保加利亞分腿蹲", "啞鈴弓步蹲", "蹬腿", "提踵(小腿)"], 
+        "肩膀": ["槓鈴肩推", "啞鈴肩推", "啞鈴側平舉", "啞鈴前平舉", "後三角飛鳥", "臉拉", "聳肩", "阿諾推舉"], 
+        "二頭": ["槓鈴彎舉", "啞鈴彎舉", "垂式彎舉", "牧師椅彎舉", "滑輪彎舉", "集中彎舉"], 
+        "三頭": ["滑輪下壓", "啞鈴頸後屈伸", "窄握臥推", "仰臥臂屈伸(骷髏破碎者)", "雙槓臂屈伸", "法式推舉"], 
+        "腹肌": ["捲腹", "仰臥舉腿", "俄羅斯轉體", "棒式", "懸垂舉腿", "滾輪"], 
+        "有氧": ["跑步機", "橢圓機", "登階機", "飛輪", "划船機", "跳繩", "波比跳"] 
     };
     const allGroups = Object.keys(exerciseDB), daysZh = ["日", "一", "二", "三", "四", "五", "六"];
 
@@ -188,37 +234,72 @@
     function updateItems() {
         const g = document.getElementById('inputGroup').value;
         document.getElementById('inputItem').innerHTML = (exerciseDB[g] || []).map(i => `<option value="${i}">${i}</option>`).join('');
-        const isCrdo = (g === "有氧");
-        document.getElementById('strengthFields').style.display = isCrdo ? 'none' : 'flex';
-        document.getElementById('cardioFields').style.display = isCrdo ? 'flex' : 'none';
+        handleItemChange();
+    }
+
+    function handleItemChange() {
+        const g = document.getElementById('inputGroup').value;
+        const i = document.getElementById('inputItem').value;
+        document.getElementById('strengthFields').style.display = 'none';
+        document.getElementById('dynamicCardioFields').style.display = 'none';
+        document.getElementById('slopeField').style.display = 'none';
+        document.getElementById('speedField').style.display = 'none';
+        document.getElementById('repsField').style.display = 'none';
+        if (g === "有氧") {
+            document.getElementById('dynamicCardioFields').style.display = 'grid';
+            if (["跑步機", "橢圓機"].includes(i)) {
+                document.getElementById('slopeField').style.display = 'flex';
+                document.getElementById('speedField').style.display = 'flex';
+            } else if (["飛輪", "划船機", "登階機"].includes(i)) {
+                document.getElementById('speedField').style.display = 'flex';
+            } else if (["跳繩", "波比跳"].includes(i)) {
+                document.getElementById('repsField').style.display = 'flex';
+            }
+        } else {
+            document.getElementById('strengthFields').style.display = 'flex';
+        }
     }
 
     function saveRecord() {
         const g = document.getElementById('inputGroup').value;
         const d = document.getElementById('inputDate').value;
-        let e = { id: Date.now(), date: d, group: g, item: document.getElementById('inputItem').value, isCrdo: (g === '有氧') };
+        const i = document.getElementById('inputItem').value;
+        let e = { id: Date.now(), date: d, group: g, item: i, isCrdo: (g === '有氧') };
         if(e.isCrdo) {
             e.slope = document.getElementById('inputSlope').value || 0;
             e.speed = document.getElementById('inputSpeed').value || 0;
+            e.reps = document.getElementById('inputReps').value || 0;
             e.time = document.getElementById('inputTime').value || 0;
         } else {
             e.weight = document.getElementById('inputW').value || 0;
             e.sets = document.getElementById('inputS').value || 0;
         }
-        logs.push(e); localStorage.setItem('gym_v62_logs', JSON.stringify(logs)); renderHistory(); updateCharts();
+        logs.push(e); localStorage.setItem('gym_v67_logs', JSON.stringify(logs)); renderHistory(); updateCharts();
         alert("紀錄已儲存！");
     }
 
+    // === V67: 歷史日誌欄位 平均分散實作 ===
     function renderHistory() {
         const f = document.getElementById('historyFilter').value;
         const h = document.getElementById('historyHead');
         const b = document.getElementById('historyBody');
-        h.innerHTML = (activeMode === 'str' ? `<tr><th>肌群</th><th>項目</th><th>kg</th><th>組</th><th>操作</th></tr>` : `<tr><th>項目</th><th>坡度</th><th>速</th><th>min</th><th>操作</th></tr>`);
+        
+        if(activeMode === 'str') {
+            h.innerHTML = `<tr><th>肌群</th><th>項目</th><th>kg</th><th>組數</th><th>操作</th></tr>`;
+        } else {
+            h.innerHTML = `<tr><th>項目</th><th>數據/坡度</th><th>速度/次</th><th>分鐘</th><th>操作</th></tr>`;
+        }
+        
         const filtered = logs.filter(l => l.date === f && l.isCrdo === (activeMode === 'crdo')).reverse();
         b.innerHTML = filtered.map(l => {
             const colorClass = (activeMode === 'str' ? 'var(--accent)' : 'var(--plum)');
-            if(activeMode === 'str') return `<tr><td style="color:${colorClass}; font-weight:bold;">${l.group}</td><td>${l.item}</td><td>${l.weight}</td><td>${l.sets}</td><td><button style="color:#822727; background:none; border:none; cursor:pointer;" onclick="deleteLog(${l.id})">✕</button></td></tr>`;
-            return `<tr><td style="color:${colorClass}; font-weight:bold;">${l.item}</td><td>${l.slope}%</td><td>${l.speed}</td><td>${l.time}</td><td><button style="color:#822727; background:none; border:none; cursor:pointer;" onclick="deleteLog(${l.id})">✕</button></td></tr>`;
+            if(activeMode === 'str') {
+                return `<tr><td style="color:${colorClass}; font-weight:bold;">${l.group}</td><td>${l.item}</td><td>${l.weight}</td><td>${l.sets}</td><td><button class="btn-del" onclick="deleteLog(${l.id})">✕</button></td></tr>`;
+            } else {
+                let mainData = (["跳繩", "波比跳"].includes(l.item)) ? `${l.reps}次` : `${l.slope}%`;
+                let subData = (["跳繩", "波比跳"].includes(l.item)) ? "-" : l.speed;
+                return `<tr><td style="color:${colorClass}; font-weight:bold;">${l.item}</td><td>${mainData}</td><td>${subData}</td><td>${l.time}</td><td><button class="btn-del" onclick="deleteLog(${l.id})">✕</button></td></tr>`;
+            }
         }).join('');
     }
 
@@ -246,7 +327,7 @@
     function renderTaskList() {
         const dStr = document.getElementById('inputDate').value || getGymDate();
         const day = new Date(dStr + "T00:00:00").getDay();
-        const rt = routineData[day] || [], saved = JSON.parse(localStorage.getItem('gym_v62_tasks_' + dStr)) || {};
+        const rt = routineData[day] || [], saved = JSON.parse(localStorage.getItem('gym_v67_tasks_' + dStr)) || {};
         const tbody = document.getElementById('dynamicTaskList'); tbody.innerHTML = '';
         const add = (id, txt) => {
             const tr = document.createElement('tr');
@@ -254,54 +335,48 @@
                             <td style="padding:10px 0; border-bottom:1px solid #121416; color:var(--text-main); font-size:1rem;" onclick="document.getElementById('t_${id}').click()">${txt}</td>`;
             tbody.appendChild(tr);
         };
-        add('w1', '動態拉伸熱身'); add('w2', '目標肌群預熱');
-        rt.forEach((r, i) => add('d_'+i, (r.group === '有氧' ? `有氧訓練 ${r.val}分` : `重訓(${r.group}) ${r.val}組`)));
-        add('c', '冷身與拉伸');
+        add('w1', '動態熱身'); add('w2', '目標預熱');
+        rt.forEach((r, i) => add('d_'+i, (r.group === '有氧' ? `有氧 ${r.val}分` : `重訓(${r.group}) ${r.val}組`)));
+        add('c', '拉伸冷身');
     }
 
     function saveTasks() {
         const dStr = document.getElementById('inputDate').value || getGymDate();
         let s = {}; document.querySelectorAll('#dynamicTaskList input').forEach(c => s[c.id.replace('t_', '')] = c.checked);
-        localStorage.setItem('gym_v62_tasks_' + dStr, JSON.stringify(s));
+        localStorage.setItem('gym_v67_tasks_' + dStr, JSON.stringify(s));
     }
-
     function openRoutineModal() { document.getElementById('routineModal').style.display = 'flex'; renderRoutineEditor(); }
     function closeRoutineModal() { document.getElementById('routineModal').style.display = 'none'; }
-    
     function renderRoutineEditor() {
         const day = document.getElementById('routineDaySelect').value;
         const list = document.getElementById('routineItemsList'); list.innerHTML = '';
         (routineData[day] || []).forEach(item => {
             const row = document.createElement('div'); row.className = 'routine-row';
-            row.innerHTML = `<select>${allGroups.map(g => `<option value="${g}" ${g==item.group?'selected':''}>${g}</option>`).join('')}</select>
-                             <input type="number" value="${item.val}">
+            row.innerHTML = `<select style="flex:2;">${allGroups.map(g => `<option value="${g}" ${g==item.group?'selected':''}>${g}</option>`).join('')}</select>
+                             <input type="number" style="flex:1;" value="${item.val}">
                              <button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>`;
             list.appendChild(row);
         });
     }
-
     function addRoutineItem() {
         const row = document.createElement('div'); row.className = 'routine-row';
-        row.innerHTML = `<select>${allGroups.map(g => `<option value="${g}">${g}</option>`).join('')}</select><input type="number" placeholder="組/分"><button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>`;
+        row.innerHTML = `<select style="flex:2;">${allGroups.map(g => `<option value="${g}">胸部</option><option value="背部">背部</option><option value="腿部">腿部</option><option value="肩膀">肩膀</option><option value="二頭">二頭</option><option value="有氧">有氧</option>`).join('')}</select><input type="number" style="flex:1;"><button onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>`;
         document.getElementById('routineItemsList').appendChild(row);
     }
-
     function saveRoutine() {
         const day = document.getElementById('routineDaySelect').value;
         let items = [];
         document.querySelectorAll('#routineItemsList .routine-row').forEach(r => {
-            const sel = r.querySelector('select').value;
-            const val = r.querySelector('input').value;
-            if(val) items.push({ group: sel, val: parseInt(val) });
+            const v = r.querySelector('input').value;
+            if(v) items.push({ group: r.querySelector('select').value, val: parseInt(v) });
         });
-        routineData[day] = items; localStorage.setItem('gym_v62_routine', JSON.stringify(routineData));
+        routineData[day] = items; localStorage.setItem('gym_v67_routine', JSON.stringify(routineData));
         renderTaskList();
         const btn = document.getElementById('saveRoutineBtn');
         btn.innerText = "✅ 儲存成功"; btn.style.background = "#065f46";
         setTimeout(()=>{ btn.innerText="儲存此日菜單"; btn.style.background="var(--accent)"; }, 1500);
     }
-
-    function doCheckIn() { const t = getGymDate(); checks[t] = true; localStorage.setItem('gym_v62_checks', JSON.stringify(checks)); renderCalendar(); updateCheckBtn(); }
+    function doCheckIn() { const t = getGymDate(); checks[t] = true; localStorage.setItem('gym_v67_checks', JSON.stringify(checks)); renderCalendar(); updateCheckBtn(); }
     function updateCheckBtn() { const b = document.getElementById('checkInBtn'); if(checks[getGymDate()]) { b.disabled = true; b.innerText = "✅ 今日已打卡"; } }
     function changeMonth(s) { currentCalDate.setMonth(currentCalDate.getMonth()+s); renderCalendar(); }
     function renderCalendar() {
@@ -316,7 +391,7 @@
         }
     }
     function resetHistory() { document.getElementById('historyFilter').value = getGymDate(); renderHistory(); }
-    function deleteLog(id) { if(!confirm("確定要刪除這筆紀錄嗎？")) return; logs = logs.filter(l => l.id !== id); localStorage.setItem('gym_v62_logs', JSON.stringify(logs)); renderHistory(); updateCharts(); }
+    function deleteLog(id) { if(!confirm("確定要刪除這筆紀錄嗎？")) return; logs = logs.filter(l => l.id !== id); localStorage.setItem('gym_v67_logs', JSON.stringify(logs)); renderHistory(); updateCharts(); }
 </script>
 </body>
 </html>
